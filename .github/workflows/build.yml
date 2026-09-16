@@ -1,0 +1,43 @@
+name: StaffCore Java 25 Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Java 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '25'
+          cache: maven
+
+      - name: Entpacken
+        run: |
+          mkdir build-input
+          unzip -q StaffCore_ClaudeChat_Complete_2026-09-16.zip -d build-input
+
+      - name: Build
+        working-directory: build-input/StaffCore
+        run: |
+          chmod +x mvnw
+          ./mvnw -B clean verify
+
+      - name: Ergebnisse speichern
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: StaffCore-build-results
+          path: |
+            build-input/StaffCore/**/target/
