@@ -29,6 +29,15 @@ jobs:
           unzip -q StaffCore_ClaudeChat_Complete_2026-09-16.zip -d build-input
           test -f build-input/StaffCore/pom.xml
 
+      - name: Velocity RegisteredServer Import korrigieren
+        run: |
+          find build-input/StaffCore/staffcore-velocity/src/main/java -name "*.java" \
+            -exec sed -i 's/import com\.velocitypowered\.api\.proxy\.RegisteredServer;/import com.velocitypowered.api.proxy.server.RegisteredServer;/g' {} +
+
+          grep -rl 'import com.velocitypowered.api.proxy.\*;' \
+            build-input/StaffCore/staffcore-velocity/src/main/java | \
+            xargs -r sed -i 's/import com\.velocitypowered\.api\.proxy\.\*;/import com.velocitypowered.api.proxy.*;import com.velocitypowered.api.proxy.server.RegisteredServer;/'
+
       - name: Maven Build + Tests
         working-directory: build-input/StaffCore
         run: |
